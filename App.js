@@ -1,14 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
 import Tabbar from "@mindinventory/react-native-tab-bar-interaction";
 
-// SVG 아이콘 (Expo 환경에서 사용하려면 아래 전제사항 필수)
-// 1) npx expo install react-native-svg
-// 2) npm install --save-dev react-native-svg-transformer
-// 3) metro.config.js 설정
 import HomeIcon from "./assets/home.svg";
 import FriendsIcon from "./assets/friends.svg";
 import WriteIcon from "./assets/write.svg";
@@ -18,6 +14,15 @@ import { DataProvider } from "./DataContext";
 import HomeScreen from "./src/screens/HomeScreen";
 import CreateScreen from "./src/screens/CreateScreen";
 import WriteScreen from "./src/screens/WriteScreen";
+import RecordScreen from "./src/screens/RecordScreen";
+import InitialScreen from "./src/screens/InitialScreen";
+
+// SplashScreen.preventAutoHideAsync();
+// setTimeout(SplashScreen.hideAsync, 3000);
+
+// 네비게이터 생성
+const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 const FriendsScreen = () => (
   <View style={styles.screen}>
@@ -73,10 +78,6 @@ function CustomTabBar({ state, descriptors, navigation }) {
   );
 }
 
-// 네비게이터 생성
-const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
-
 // HomeStack 예시
 function HomeStack() {
   return (
@@ -87,20 +88,38 @@ function HomeStack() {
   );
 }
 
+function WriteStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Write" component={WriteScreen} />
+      <Stack.Screen name="Record" component={RecordScreen} />
+    </Stack.Navigator>
+  );
+}
+
 export default function App() {
+  const [isLogin, setLogin] = useState(false);
+  const handleLogin = () => {
+    setLogin(true);
+  };
+
   return (
     <DataProvider>
       <NavigationContainer>
-        <Tab.Navigator
-          screenOptions={{
-            headerShown: false,
-          }}
-          tabBar={(props) => <CustomTabBar {...props} />}
-        >
-          <Tab.Screen name="Home" component={HomeStack} />
-          <Tab.Screen name="Write" component={WriteScreen} />
-          <Tab.Screen name="Friends" component={FriendsScreen} />
-        </Tab.Navigator>
+        {isLogin ? (
+          <Tab.Navigator
+            screenOptions={{
+              headerShown: false,
+            }}
+            tabBar={(props) => <CustomTabBar {...props} />}
+          >
+            <Tab.Screen name="Home" component={HomeStack} />
+            <Tab.Screen name="Write" component={WriteStack} />
+            <Tab.Screen name="Friends" component={FriendsScreen} />
+          </Tab.Navigator>
+        ) : (
+          <InitialScreen handleLogin={handleLogin} />
+        )}
       </NavigationContainer>
     </DataProvider>
   );
