@@ -14,18 +14,14 @@ import FriendsIcon from "./assets/friends.svg";
 import WriteIcon from "./assets/write.svg";
 
 // 화면 컴포넌트
+import { DataProvider } from "./DataContext";
 import HomeScreen from "./src/screens/HomeScreen";
 import CreateScreen from "./src/screens/CreateScreen";
+import WriteScreen from "./src/screens/WriteScreen";
 
 const FriendsScreen = () => (
   <View style={styles.screen}>
     <Text style={styles.text}>친구 화면</Text>
-  </View>
-);
-
-const WriteScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>작성 화면</Text>
   </View>
 );
 
@@ -70,9 +66,6 @@ function CustomTabBar({ state, descriptors, navigation }) {
                 fill={isFocused ? "#4DB6AC" : "gray"}
               />
             )}
-            <Text style={[styles.label, isFocused && styles.labelFocused]}>
-              {route.name}
-            </Text>
           </TouchableOpacity>
         );
       })}
@@ -96,18 +89,20 @@ function HomeStack() {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-        tabBar={(props) => <CustomTabBar {...props} />}
-      >
-        <Tab.Screen name="Home" component={HomeStack} />
-        <Tab.Screen name="Write" component={WriteScreen} />
-        <Tab.Screen name="Friends" component={FriendsScreen} />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <DataProvider>
+      <NavigationContainer>
+        <Tab.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+          tabBar={(props) => <CustomTabBar {...props} />}
+        >
+          <Tab.Screen name="Home" component={HomeStack} />
+          <Tab.Screen name="Write" component={WriteScreen} />
+          <Tab.Screen name="Friends" component={FriendsScreen} />
+        </Tab.Navigator>
+      </NavigationContainer>
+    </DataProvider>
   );
 }
 
