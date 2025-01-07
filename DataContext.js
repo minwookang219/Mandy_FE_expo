@@ -9,6 +9,7 @@ export const DataProvider = ({ children }) => {
   const [data, setData] = useState(null);
   const [id, setId] = useState(null);
   const [title, setTitle] = useState("");
+  const [mainGoal, setMainGoal] = useState(""); // WriteScreen용, 언제나 서버 main_goal
   const [centerData, setCenterData] = useState(""); // 중앙(메인 목표)
   const [outerData, setOuterData] = useState([]); // 바깥(서브 목표)
   const [allDetailGoals, setAllDetailGoals] = useState([]); // 세부 목표
@@ -44,6 +45,7 @@ export const DataProvider = ({ children }) => {
         setData(fetchedData);
         setId(fetchedData.id);
         setTitle(fetchedData.title); // 제목 업데이트
+        setMainGoal(fetchedData.main_goal);
         setCenterData(fetchedData.main_goal); // 중앙 = 메인 목표
         setOuterData(filledSubGoals); // 바깥 = 서브 목표 8개
         setAllDetailGoals(filledDetailGoals); // 세부 목표 데이터 설정
@@ -64,6 +66,7 @@ export const DataProvider = ({ children }) => {
         centerData,
         outerData,
         allDetailGoals,
+        mainGoal,
         setData,
         setId,
         setTitle,
