@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
 import PencilIcon from "../../assets/pencil.svg";
 import CheckIcon from "../../assets/submit.svg";
 import { useNavigation } from "@react-navigation/native";
+import { DataContext } from "../../DataContext";
 
 const { width } = Dimensions.get("window");
 const CONTAINER_SIZE = width - 40;
@@ -47,70 +48,18 @@ const HomeScreen = () => {
   const navigation = useNavigation();
   const [isEditing, setIsEditing] = useState(false);
   // 상태 관리
-  const [data, setData] = useState(null); // 전체 데이터
-  const [id, setId] = useState(null);
-  const [title, setTitle] = useState("");
-  const [centerData, setCenterData] = useState(null); // 중심 데이터
-  const [outerData, setOuterData] = useState([]); // 외곽 데이터
-  const [allDetailGoals, setAllDetailGoals] = useState([]);
-
-  // Django 서버
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          "http://143.248.228.45:8000/myapp/read/1/"
-        );
-        const fetchedData = await response.json();
-
-        // sub_goals 처리
-        const subGoals = fetchedData.sub_goals || [];
-        const subGoalsToFill = Math.max(0, 8 - subGoals.length); // 음수 방지
-        const filledSubGoals = [
-          ...subGoals,
-          ...Array(subGoalsToFill).fill({ sub_id: null, sub_goal: "" }),
-        ];
-
-        // detail_goals 처리
-        const detailGoals = fetchedData.detail_goals || [];
-        const detailGoalsToFill = Math.max(0, 8 - detailGoals.length); // 음수 방지
-        const filledDetailGoals = [
-          ...detailGoals,
-          ...Array(detailGoalsToFill).fill({
-            det_id: null,
-            sub_id: null,
-            det_goal: "",
-          }),
-        ];
-
-        setData(fetchedData);
-        setId(fetchedData.id);
-        setTitle(fetchedData.title); // 제목 업데이트
-        setCenterData(fetchedData.main_goal); // 중앙 = 메인 목표
-        setOuterData(filledSubGoals); // 바깥 = 서브 목표 8개
-        setAllDetailGoals(filledDetailGoals); // 세부 목표 데이터 설정
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData(); // 비동기 함수 호출
-  }, []);
-
-  // 목업
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     // 나중에 Django 서버에서 가져오게 변경 가능
-  //     const fetchedData = mockData; // 현재는 mockData로 테스트
-  //     setData(fetchedData);
-  //     setId(fetchedData.id);
-  //     setTitle(fetchedData.title);
-  //     setCenterData(fetchedData.main_goal);
-  //     setOuterData(fetchedData.sub_goals);
-  //     setAllDetailGoals(fetchedData.detail_goals);
-  //   };
-  //   fetchData();
-  // }, []);
+  const {
+    // DataContext에서 가져옴
+    data,
+    id,
+    title,
+    centerData,
+    outerData,
+    allDetailGoals,
+    setTitle,
+    setCenterData,
+    setOuterData,
+  } = useContext(DataContext);
 
   // 도형 데이터
   const shapes = [
@@ -283,7 +232,7 @@ const HomeScreen = () => {
             id: id,
             title: title,
             main_goal: centerData,
-            sub_goals: outerData, // 실제로는 구조 맞춰서 보내야 함
+            sub_goals: outerData,
           }),
         });
 
@@ -294,10 +243,12 @@ const HomeScreen = () => {
     }
   };
 
-  // ====== [추가] 사각형 텍스트 수정 핸들러 ======
   const handleChangeBoxText = (text, outIndex) => {
     // outerData를 복사한 뒤 해당 인덱스의 텍스트만 업데이트
     const newOuterData = [...outerData];
+    if (!newOuterData[outIndex]) {
+      newOuterData[outIndex] = {};
+    }
     // det_goal (세부 목표) 또는 sub_goal 중 무엇을 수정하는지에 따라 다름
     // 여기서는 'det_goal' 키가 있으면 det_goal, 아니면 sub_goal 로 가정
     if (newOuterData[outIndex]) {
