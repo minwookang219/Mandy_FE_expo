@@ -10,17 +10,18 @@ import {
 // 중요: 아래 라이브러리를 임포트
 import { Dropdown } from "react-native-element-dropdown";
 import { DataContext } from "../../DataContext";
-import { Button } from "react-native-web";
+import { useNavigation } from "@react-navigation/native";
 
 export default function WriteScreen() {
+  const navigation = useNavigation();
   // DataContext에서 데이터 가져옴
-  const { centerData, outerData, allDetailGoals } = useContext(DataContext);
+  const { mainGoal, outerData, allDetailGoals } = useContext(DataContext);
 
   // 선택된 값 상태
   const [selectedSubGoal, setSelectedSubGoal] = useState("");
   const [selectedDetailGoal, setSelectedDetailGoal] = useState("");
 
-  const [diaryText, setDiaryText] = useState("");
+  const [record_content, setRecordContent] = useState("");
 
   // react-native-element-dropdown은 data 배열의 각 아이템이 {label, value} 형태를 권장
   // => outerData / allDetailGoals를 변환해서 사용
@@ -35,18 +36,46 @@ export default function WriteScreen() {
 
   const detailGoalsData = useMemo(
     () =>
-      allDetailGoals.map((dg, i) => ({
+      allDetailGoals.map((dg) => ({
         label: dg.det_goal || "(없음)",
-        value: dg.det_goal || "",
+        value: dg,
       })),
     [allDetailGoals]
   );
+
+  const handleSubmit = async () => {
+    try {
+      console.log(selectedDetailGoal);
+      const response = await fetch(
+        "http://143.248.228.45:8000/achieve/achievements/",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            det_id: selectedDetailGoal.det_id, // detailGoal의 ID
+            content: record_content, // 작성한 내용
+          }),
+        }
+      );
+
+      if (response.ok) {
+        console.log("작성 완료");
+        var det_id = selectedDetailGoal.det_id;
+        console.log(det_id);
+        navigation.navigate("Record", { det_id });
+      } else {
+        console.log("작성 실패: 응답 오류", response.status);
+      }
+    } catch (error) {
+      console.log("작성 실패:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
       {/* 상단 문구 */}
       <Text style={styles.title}>
-        <Text style={{ color: "#0077ff" }}>{centerData}</Text>, 달성해볼까요?
+        <Text style={{ color: "#0077ff" }}>{mainGoal}</Text>, 달성해볼까요?
       </Text>
 
       {/* 1) 주요 목표 드롭다운 */}
@@ -75,6 +104,7 @@ export default function WriteScreen() {
         placeholder="(선택하세요)"
         value={selectedDetailGoal}
         onChange={(item) => {
+          console.log("Selected item:", item);
           setSelectedDetailGoal(item.value);
         }}
       />
@@ -88,11 +118,11 @@ export default function WriteScreen() {
               multiline
               numberOfLines={3}
               placeholder="예) 오늘은 이 목표를 위해 간단한 준비를 했다..."
-              value={diaryText}
-              onChangeText={(text) => setDiaryText(text)}
+              value={record_content}
+              onChangeText={(text) => setRecordContent(text)}
             />
           </View>
-          <TouchableOpacity style={styles.deleteButton}>
+          <TouchableOpacity style={styles.deleteButton} onPress={handleSubmit}>
             <Text style={{ color: "#fff", fontWeight: "bold" }}>작성하기</Text>
           </TouchableOpacity>
         </View>
