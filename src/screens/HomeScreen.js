@@ -287,7 +287,7 @@ const HomeScreen = () => {
     <View style={styles.container}>
       {/* 상단 타이틀 */}
       <View style={styles.titleContainer}>
-        <View style={styles.leftContainer}>
+        <View style={styles.leftBlock}>
           <TouchableOpacity onPress={handleTitlePress} activeOpacity={0.5}>
             {isEditing ? (
               <TextInput
@@ -312,7 +312,7 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <View>
+        <View style={styles.rightBlock}>
           {/* 편집 모드가 아닐 때: "추가하기" 버튼 */}
           {!isEditing ? (
             <TouchableOpacity
@@ -444,19 +444,26 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "space-between", // 왼쪽 블록 - 오른쪽 블록 사이 간격
+    alignItems: "flex-start",
     paddingHorizontal: 10,
     marginTop: 10,
     marginBottom: 15,
   },
-  leftContainer: {
-    flexDirection: "row", // 제목과 수정 버튼을 가로로 정렬
-    alignItems: "center", // 세로 중앙 정렬
+  leftBlock: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+  },
+
+  rightBlock: {
+    // 특별한 스타일 없으면 생략 가능
+    alignItems: "flex-end",
   },
   title: {
     fontSize: 18,
     fontWeight: "bold",
+    alignSelf: "flex-start",
+    alignItems: "flex-start",
   },
   grid: {
     flexWrap: "wrap",
@@ -498,13 +505,14 @@ const styles = StyleSheet.create({
     marginRight: 70,
   },
   addButton: {
-    marginLeft: 100,
     fontSize: 18,
     fontWeight: "600",
     color: "#333",
     backgroundColor: "#ddd",
     paddingVertical: 5,
     paddingHorizontal: 10,
+    alignSelf: "flex-end",
+    alignItems: "flex-end",
     borderRadius: 5,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1, // Shadow transparency
@@ -512,11 +520,12 @@ const styles = StyleSheet.create({
     elevation: 4, // Shadow for Android
   },
   deleteButton: {
-    marginLeft: 100,
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
     backgroundColor: "#ff8585",
+    alignSelf: "flex-end",
+    alignItems: "flex-end",
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 5,
