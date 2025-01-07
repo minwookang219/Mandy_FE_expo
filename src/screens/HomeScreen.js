@@ -283,16 +283,9 @@ const HomeScreen = () => {
             id: id,
             title: title,
             main_goal: centerData,
-            // sub_goals: outerData,   // 실제로는 구조 맞춰서 보내야 함
+            sub_goals: outerData, // 실제로는 구조 맞춰서 보내야 함
           }),
         });
-
-        // axios 예시
-        // await axios.patch("http://YOUR_API_SERVER/patch-goal", {
-        //   title: title,
-        //   main_goal: centerData,
-        //   sub_goals: outerData,
-        // });
 
         console.log("PATCH 성공");
       } catch (err) {
