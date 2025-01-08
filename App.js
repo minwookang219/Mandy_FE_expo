@@ -27,16 +27,11 @@ import CreateScreen from "./src/screens/CreateScreen";
 import WriteScreen from "./src/screens/WriteScreen";
 import RecordScreen from "./src/screens/RecordScreen";
 import InitialScreen from "./src/screens/InitialScreen";
+import FriendsScreen from "./src/screens/FriendsScreen";
 import { DataContext } from "./DataContext";
 // 네비게이터 생성
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
-
-const FriendsScreen = () => (
-  <View style={styles.screen}>
-    <Text style={styles.text}>친구 화면</Text>
-  </View>
-);
 
 function HomeStack() {
   return (
@@ -112,6 +107,26 @@ function WriteStack() {
   );
 }
 
+function FriendsStack() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="FriendsMain"
+        component={FriendsScreen}
+        options={{
+          header: () => (
+            <CustomHeader>
+              <Text style={{ fontSize: 25, fontWeight: "bold" }}>
+                달성도 순위
+              </Text>
+            </CustomHeader>
+          ),
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
 export default function App() {
   const [isLogin, setLogin] = useState(false);
   const handleLogin = () => {
@@ -181,6 +196,7 @@ export default function App() {
               position="LEFT"
               options={{
                 headerShown: false, // 기본 헤더 숨기기
+                unmountOnBlur: true,
               }}
             />
             <CurvedBottomBarExpo.Screen
@@ -189,14 +205,16 @@ export default function App() {
               position="CENTER"
               options={{
                 headerShown: false, // 기본 헤더 숨기기
+                unmountOnBlur: true,
               }}
             />
             <CurvedBottomBarExpo.Screen
               name="Friends"
-              component={FriendsScreen} // Replace with your FriendsScreen
+              component={FriendsStack}
               position="RIGHT"
               options={{
                 headerShown: false, // 기본 헤더 숨기기
+                unmountOnBlur: true,
               }}
             />
           </CurvedBottomBarExpo.Navigator>

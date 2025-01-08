@@ -5,10 +5,9 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  Keyboard,
   TouchableOpacity,
+  Keyboard,
   TouchableWithoutFeedback,
-  KeyboardAvoidingView,
 } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import { DataContext } from "../../DataContext";
