@@ -74,9 +74,6 @@ export default function WriteScreen() {
   return (
     <View style={styles.container}>
       {/* 상단 문구 */}
-      <Text style={styles.title}>
-        <Text style={{ color: "#0077ff" }}>{mainGoal}</Text>, 달성해볼까요?
-      </Text>
 
       {/* 1) 주요 목표 드롭다운 */}
       <Text style={styles.label}>주요 목표를 선택하세요.</Text>
@@ -143,6 +140,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
+    fontSize: 20,
     fontWeight: "600",
     marginBottom: 5,
   },
