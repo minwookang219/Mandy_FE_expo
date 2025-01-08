@@ -18,7 +18,7 @@ export const DataProvider = ({ children }) => {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "http://143.248.228.45:8000/myapp/read/3/"
+          "http://143.248.228.45:8000/myapp/read/17/"
         );
         const fetchedData = await response.json();
 
