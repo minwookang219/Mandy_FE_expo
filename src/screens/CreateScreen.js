@@ -103,10 +103,10 @@ const CreateScreen = () => {
         }
       );
       if (response.ok) {
-        data = data.replace(/^"|"$/g, "");
-
+        const data = await response.text(); // 서버에서 문자열 반환
         const goals = data.split(", "); // ", "로 나눠 배열로 변환
-        setRecommendedGoals(goals);
+        const cleanedGoals = goals.map((goal) => goal.replace(/^"|"$/g, "")); // 각 요소에서 쌍따옴표 제거
+        setRecommendedGoals(cleanedGoals);
       } else {
         Alert.alert("오류", "목표 추천을 가져오는 중 오류가 발생했습니다.");
       }
