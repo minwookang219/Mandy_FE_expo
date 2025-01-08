@@ -7,6 +7,7 @@ import {
   Dimensions,
 } from "react-native";
 import React from "react";
+import LoginIcon from "../../assets/login.svg";
 
 const InitialScreen = ({ handleLogin }) => {
   return (
@@ -17,8 +18,12 @@ const InitialScreen = ({ handleLogin }) => {
           style={styles.image}
         />
       </View>
-      <TouchableOpacity activeOpacity={0.7} onPress={handleLogin}>
-        <Text style={styles.button}>로그인</Text>
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={handleLogin}
+        style={{ marginTop: 20 }}
+      >
+        <LoginIcon></LoginIcon>
       </TouchableOpacity>
     </View>
   );
