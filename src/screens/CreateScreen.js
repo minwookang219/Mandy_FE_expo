@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff",
-    backgroundColor: "#0077FF",
+    backgroundColor: "#0ea982",
     alignSelf: "flex-end",
     alignItems: "flex-end",
     paddingLeft: 10,

@@ -79,7 +79,7 @@ export default function WriteScreen() {
       {/* 상단 문구 */}
 
       {/* 1) 주요 목표 드롭다운 */}
-      <Text style={styles.label}>주요 목표를 선택하세요.</Text>
+      <Text style={styles.label}>세부 목표를 선택하세요.</Text>
       <Dropdown
         style={styles.dropdown}
         containerStyle={styles.dropdownContainer}
@@ -94,7 +94,7 @@ export default function WriteScreen() {
       />
 
       {/* 2) 세부 목표 드롭다운 */}
-      <Text style={styles.label}>세부 목표를 선택하세요.</Text>
+      <Text style={styles.label}>실천 사항을 선택하세요.</Text>
       <Dropdown
         style={styles.dropdown}
         containerStyle={styles.dropdownContainer}
