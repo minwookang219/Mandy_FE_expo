@@ -109,7 +109,7 @@ export default function RecordScreen() {
           onPress={() => handleDelete(item.id)}
           styles={styles.deleteButton}
         >
-          <DeleteIcon width={15} height={15} fill="#C7C7C7" />
+          <DeleteIcon width={30} height={30} fill="#C7C7C7" />
         </TouchableOpacity>
       </View>
     );
@@ -173,9 +173,11 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   deleteButton: {
+    paddingTop: 3,
     marginLeft: 8,
     padding: 4,
     justifyContent: "center",
     alignItems: "center",
+    alignSelf: "center",
   },
 });

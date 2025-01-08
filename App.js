@@ -10,6 +10,7 @@ import {
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
+import { useRoute, useNavigation } from "@react-navigation/native";
 
 import { CurvedBottomBarExpo } from "react-native-curved-bottom-bar";
 import CustomHeader from "./src/components/CustomHeader";
@@ -94,9 +95,18 @@ function WriteStack() {
       <Stack.Screen
         name="Record"
         component={RecordScreen}
-        options={{
-          header: () => <CustomHeader />,
-        }}
+        options={({ route }) => ({
+          header: () => (
+            <CustomHeader>
+              <Text style={{ fontSize: 25, fontWeight: "bold" }}>
+                <Text style={{ color: "#0077ff" }}>
+                  {route.params?.det_goal || "목표"}
+                </Text>
+                {"의 달성 기록이에요."}
+              </Text>
+            </CustomHeader>
+          ),
+        })}
       />
     </Stack.Navigator>
   );

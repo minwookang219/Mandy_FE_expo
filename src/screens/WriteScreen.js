@@ -5,9 +5,11 @@ import {
   Text,
   StyleSheet,
   TextInput,
+  Keyboard,
   TouchableOpacity,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
 } from "react-native";
-// 중요: 아래 라이브러리를 임포트
 import { Dropdown } from "react-native-element-dropdown";
 import { DataContext } from "../../DataContext";
 import { useNavigation } from "@react-navigation/native";
@@ -18,6 +20,7 @@ export default function WriteScreen() {
   const { mainGoal, outerData, allDetailGoals } = useContext(DataContext);
 
   // 선택된 값 상태
+  const [selectedDetailGoalId, setSelectedDetailGoalId] = useState(null);
   const [selectedSubGoal, setSelectedSubGoal] = useState("");
   const [selectedDetailGoal, setSelectedDetailGoal] = useState("");
 
@@ -38,7 +41,7 @@ export default function WriteScreen() {
     () =>
       allDetailGoals.map((dg) => ({
         label: dg.det_goal || "(없음)",
-        value: dg,
+        value: dg.det_id,
       })),
     [allDetailGoals]
   );
@@ -61,8 +64,9 @@ export default function WriteScreen() {
       if (response.ok) {
         console.log("작성 완료");
         var det_id = selectedDetailGoal.det_id;
+        var det_goal = selectedDetailGoal.det_goal;
         console.log(det_id);
-        navigation.navigate("Record", { det_id });
+        navigation.navigate("Record", { det_id, det_goal });
       } else {
         console.log("작성 실패: 응답 오류", response.status);
       }
@@ -99,30 +103,39 @@ export default function WriteScreen() {
         labelField="label"
         valueField="value"
         placeholder="(선택하세요)"
-        value={selectedDetailGoal}
+        value={selectedDetailGoalId}
         onChange={(item) => {
-          console.log("Selected item:", item);
-          setSelectedDetailGoal(item.value);
+          const foundDetailGoal = allDetailGoals.find(
+            (dg) => dg.det_id === item.value
+          );
+          setSelectedDetailGoal(foundDetailGoal);
         }}
       />
       {/* 세부 목표를 선택했을 때만 3줄 일기 작성 TextInput 표시 */}
       {selectedDetailGoal ? (
-        <View style={styles.diaryContainer}>
-          <Text style={styles.label}>세 줄 일기를 작성해 보세요.</Text>
-          <View style={styles.grid}>
-            <TextInput
-              style={styles.selectedText}
-              multiline
-              numberOfLines={3}
-              placeholder="예) 오늘은 이 목표를 위해 간단한 준비를 했다..."
-              value={record_content}
-              onChangeText={(text) => setRecordContent(text)}
-            />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.diaryContainer}>
+            <Text style={styles.label}>세 줄 일기를 작성해 보세요.</Text>
+            <View style={styles.grid}>
+              <TextInput
+                style={styles.selectedText}
+                multiline
+                numberOfLines={3}
+                placeholder="예) 오늘은 이 목표를 위해 간단한 준비를 했다..."
+                value={record_content}
+                onChangeText={(text) => setRecordContent(text)}
+              />
+            </View>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={handleSubmit}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                작성하기
+              </Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.deleteButton} onPress={handleSubmit}>
-            <Text style={{ color: "#fff", fontWeight: "bold" }}>작성하기</Text>
-          </TouchableOpacity>
-        </View>
+        </TouchableWithoutFeedback>
       ) : null}
     </View>
   );
