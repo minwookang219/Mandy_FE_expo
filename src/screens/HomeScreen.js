@@ -437,10 +437,10 @@ const HomeScreen = () => {
 // 스타일 정의
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "#f5f5f5",
     justifyContent: "center",
     alignItems: "center",
+    paddingTop: 70,
   },
   titleContainer: {
     flexDirection: "row",
