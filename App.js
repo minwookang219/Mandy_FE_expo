@@ -1,13 +1,23 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import React, { useState, useContext } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+  Image,
+} from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStackNavigator } from "@react-navigation/stack";
-import Tabbar from "@mindinventory/react-native-tab-bar-interaction";
 
+import { CurvedBottomBarExpo } from "react-native-curved-bottom-bar";
+import CustomHeader from "./src/components/CustomHeader";
+import SpeechBubble from "./src/components/SpeechBubble";
 import HomeIcon from "./assets/home.svg";
 import FriendsIcon from "./assets/friends.svg";
 import WriteIcon from "./assets/write.svg";
+import ThumbIcon from "./assets/thumb.svg";
 
 // 화면 컴포넌트
 import { DataProvider } from "./DataContext";
@@ -16,10 +26,7 @@ import CreateScreen from "./src/screens/CreateScreen";
 import WriteScreen from "./src/screens/WriteScreen";
 import RecordScreen from "./src/screens/RecordScreen";
 import InitialScreen from "./src/screens/InitialScreen";
-
-// SplashScreen.preventAutoHideAsync();
-// setTimeout(SplashScreen.hideAsync, 3000);
-
+import { DataContext } from "./DataContext";
 // 네비게이터 생성
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -30,69 +37,67 @@ const FriendsScreen = () => (
   </View>
 );
 
-// 커스텀 탭바
-function CustomTabBar({ state, descriptors, navigation }) {
-  return (
-    <View style={styles.tabBar}>
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const isFocused = state.index === index;
-
-        const onPress = () => {
-          if (!isFocused) {
-            navigation.navigate(route.name);
-          }
-        };
-
-        return (
-          <TouchableOpacity
-            key={route.name}
-            onPress={onPress}
-            style={styles.tabButton}
-          >
-            {route.name === "Home" && (
-              <HomeIcon
-                width={24}
-                height={24}
-                fill={isFocused ? "#4DB6AC" : "gray"}
-              />
-            )}
-            {route.name === "Friends" && (
-              <FriendsIcon
-                width={24}
-                height={24}
-                fill={isFocused ? "#4DB6AC" : "gray"}
-              />
-            )}
-            {route.name === "Write" && (
-              <WriteIcon
-                width={28}
-                height={28}
-                fill={isFocused ? "#4DB6AC" : "gray"}
-              />
-            )}
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
-}
-
-// HomeStack 예시
 function HomeStack() {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="HomeMain" component={HomeScreen} />
-      <Stack.Screen name="Create" component={CreateScreen} />
+    <Stack.Navigator headerMode="none">
+      <Stack.Screen
+        name="HomeMain"
+        component={HomeScreen}
+        options={{
+          header: () => (
+            <CustomHeader>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <ThumbIcon width={90} height={90} />
+                <SpeechBubble style={{ marginLeft: 30 }}>
+                  아자아자화이자
+                </SpeechBubble>
+              </View>
+            </CustomHeader>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="Create"
+        component={CreateScreen}
+        options={{
+          header: () => (
+            <CustomHeader>
+              <Text style={{ fontSize: 25, fontWeight: "bold" }}>
+                만다라트 생성
+              </Text>
+            </CustomHeader>
+          ),
+        }}
+      />
     </Stack.Navigator>
   );
 }
 
 function WriteStack() {
+  const { mainGoal } = useContext(DataContext);
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Write" component={WriteScreen} />
-      <Stack.Screen name="Record" component={RecordScreen} />
+    <Stack.Navigator headerMode="none">
+      <Stack.Screen
+        name="Write"
+        component={WriteScreen}
+        options={{
+          header: () => (
+            <CustomHeader>
+              <Text style={{ fontSize: 25, fontWeight: "bold" }}>
+                <Text style={{ color: "#0077ff" }}>{mainGoal}</Text>,
+                달성해볼까요?
+              </Text>
+            </CustomHeader>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="Record"
+        component={RecordScreen}
+        options={{
+          header: () => <CustomHeader />,
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -103,20 +108,88 @@ export default function App() {
     setLogin(true);
   };
 
+  const renderIcon = (routeName, selectedTab) => {
+    let IconComponent = null;
+
+    switch (routeName) {
+      case "Home":
+        IconComponent = (
+          <HomeIcon fill={routeName === selectedTab ? "#2B8EFF" : "#ccc"} />
+        );
+        break;
+      case "Write":
+        IconComponent = (
+          <WriteIcon fill={routeName === selectedTab ? "#2B8EFF" : "#ccc"} />
+        );
+        break;
+      case "Friends":
+        IconComponent = (
+          <FriendsIcon fill={routeName === selectedTab ? "#2B8EFF" : "#ccc"} />
+        );
+        break;
+      default:
+        break;
+    }
+    return IconComponent;
+  };
+
+  const renderTabBar = ({ routeName, selectedTab, navigate }) => (
+    <TouchableOpacity
+      onPress={() => navigate(routeName)}
+      style={styles.tabButton}
+    >
+      {renderIcon(routeName, selectedTab)}
+    </TouchableOpacity>
+  );
+
   return (
     <DataProvider>
       <NavigationContainer>
         {isLogin ? (
-          <Tab.Navigator
-            screenOptions={{
-              headerShown: false,
-            }}
-            tabBar={(props) => <CustomTabBar {...props} />}
+          <CurvedBottomBarExpo.Navigator
+            style={styles.bottomBar}
+            height={65}
+            circleWidth={55}
+            bgColor="#fff"
+            initialRouteName="Home"
+            borderTopLeftRight
+            renderCircle={({ navigate }) => (
+              <Animated.View>
+                <TouchableOpacity
+                  style={[styles.btnCircle, { bottom: 25 }]}
+                  onPress={() => navigate("WriteStack")}
+                >
+                  <WriteIcon width={35} height={35} fill="#fff" />
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+            tabBar={renderTabBar}
           >
-            <Tab.Screen name="Home" component={HomeStack} />
-            <Tab.Screen name="Write" component={WriteStack} />
-            <Tab.Screen name="Friends" component={FriendsScreen} />
-          </Tab.Navigator>
+            <CurvedBottomBarExpo.Screen
+              name="Home"
+              component={HomeStack}
+              position="LEFT"
+              options={{
+                headerShown: false, // 기본 헤더 숨기기
+              }}
+            />
+            <CurvedBottomBarExpo.Screen
+              name="WriteStack" // WriteStack 등록
+              component={WriteStack}
+              position="CENTER"
+              options={{
+                headerShown: false, // 기본 헤더 숨기기
+              }}
+            />
+            <CurvedBottomBarExpo.Screen
+              name="Friends"
+              component={FriendsScreen} // Replace with your FriendsScreen
+              position="RIGHT"
+              options={{
+                headerShown: false, // 기본 헤더 숨기기
+              }}
+            />
+          </CurvedBottomBarExpo.Navigator>
         ) : (
           <InitialScreen handleLogin={handleLogin} />
         )}
@@ -146,6 +219,29 @@ const styles = StyleSheet.create({
   tabButton: {
     flex: 1,
     alignItems: "center",
+    justifyContent: "center",
+  },
+  bottomBar: {
+    position: "absolute",
+    borderRadius: 20,
+    elevation: 1000,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0.5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+  },
+  btnCircle: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#2B8EFF",
+    shadowColor: "#1A1A23",
+    shadowOffset: { width: 0, height: 0.5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 0.41,
+    elevation: 5,
   },
   label: {
     fontSize: 12,
