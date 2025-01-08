@@ -1,67 +1,83 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-} from "react-native";
 import React from "react";
-import LoginIcon from "../../assets/login.svg";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import * as Google from "expo-auth-session/providers/google";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 
-const InitialScreen = ({ handleLogin }) => {
+export default function GoogleLoginScreen({ navigation }) {
+  // Google 로그인 설정
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    clientId: "1034784985558-0t1qao5f8m2i65amqb5003akhdud05da.apps.googleusercontent.com", // Google 클라이언트 ID
+    scopes: ["profile", "email"], // 최소한의 범위 설정
+  });
+
+  React.useEffect(() => {
+    if (response?.type === "success") {
+      const { id_token } = response.params;
+      handleGoogleLogin(id_token);
+    }
+  }, [response]);
+
+  // Google ID 토큰으로 Django 서버와 통신
+  const handleGoogleLogin = async (idToken) => {
+    try {
+      const res = await axios.post("http://143.248.228.45:8000/auth/google/", {
+        id_token: idToken,
+      });
+
+      const { access_token } = res.data;
+      await AsyncStorage.setItem("access_token", access_token);
+      Alert.alert("로그인 성공!", "홈 화면으로 이동합니다.");
+      navigation.navigate("Home");
+    } catch (error) {
+      if (error.response) {
+        console.error("서버 응답 오류:", error.response.data);
+      } else if (error.request) {
+        console.error("요청 오류:", error.request);
+      } else {
+        console.error("기타 오류:", error.message);
+      }
+      Alert.alert("로그인 실패", "Google 로그인을 확인하세요.");
+    }
+    
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image
-          source={require("../../assets/splash-icon.png")}
-          style={styles.image}
-        />
-      </View>
+      <Text style={styles.title}>Google로 로그인</Text>
       <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={handleLogin}
-        style={{ marginTop: 20 }}
+        style={styles.button}
+        disabled={!request}
+        onPress={() => {
+          promptAsync();
+        }}
       >
-        <LoginIcon></LoginIcon>
+        <Text style={styles.buttonText}>Google 로그인</Text>
       </TouchableOpacity>
     </View>
   );
-};
-const { width } = Dimensions.get("window");
-
-const IMAGE_SIZE = width / 3;
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
   },
-  imageContainer: {
+  title: {
+    fontSize: 24,
     marginBottom: 20,
   },
-  image: {
-    width: IMAGE_SIZE,
-    height: IMAGE_SIZE,
-  },
-  loginContainer: {},
   button: {
+    backgroundColor: "#4285F4",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
-    color: "#fff",
-    backgroundColor: "#ff8585",
-    alignSelf: "flex-end",
-    alignItems: "flex-end",
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.1, // Shadow transparency
-    shadowRadius: 4, // Shadow blur radius
-    elevation: 4, // Shadow for Android
   },
 });
-
-export default InitialScreen;
