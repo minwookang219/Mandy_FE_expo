@@ -1,67 +1,111 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Dimensions,
-} from "react-native";
-import React from "react";
-import LoginIcon from "../../assets/login.svg";
+import React, { useState } from "react";
+import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
+import axios from "axios";
+import { useContext } from "react";
+import { DataContext } from "../../DataContext";
 
-const InitialScreen = ({ handleLogin }) => {
+export default function InitialScreen({ handleLogin }) {
+  const { setId } = useContext(DataContext);
+  const [isLogin, setIsLogin] = useState(true);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleRegister = async () => {
+    try {
+      const response = await axios.post("http://143.248.228.45:8000/register/", {
+        username,
+        email,
+        password,
+      });
+      if (response.data.success) {
+        Alert.alert("회원가입 성공", response.data.message);
+        setIsLogin(true);
+      } else {
+        Alert.alert("회원가입 실패", response.data.message);
+      }
+    } catch (error) {
+      console.error("회원가입 오류:", error);
+      Alert.alert("회원가입 실패", "오류가 발생했습니다.");
+    }
+  };
+
+  const handleAttempt = async () => {
+    try {
+      const response = await axios.post("http://143.248.228.45:8000/login/", {
+        email,
+        password,
+      });
+      if (response.data.success) {
+        Alert.alert("로그인 성공", response.data.message);
+        handleLogin(); // App.js의 handleLogin_screen 호출
+      } else {
+        Alert.alert("로그인 실패", response.data.message);
+      }
+    } catch (error) {
+      console.error("로그인 오류:", error.message);
+      Alert.alert("로그인 실패", "오류가 발생했습니다.");
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image
-          source={require("../../assets/splash-icon.png")}
-          style={styles.image}
+      <Text style={styles.title}>{isLogin ? "로그인" : "회원가입"}</Text>
+
+      {!isLogin && (
+        <TextInput
+          style={styles.input}
+          placeholder="사용자 이름"
+          value={username}
+          onChangeText={setUsername}
         />
-      </View>
-      <TouchableOpacity
-        activeOpacity={0.7}
-        onPress={handleLogin}
-        style={{ marginTop: 20 }}
-      >
-        <LoginIcon></LoginIcon>
-      </TouchableOpacity>
+      )}
+      <TextInput
+        style={styles.input}
+        placeholder="이메일"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="비밀번호"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
+      <Button
+        title={isLogin ? "로그인" : "회원가입"}
+        onPress={isLogin ? handleAttempt : handleRegister}
+      />
+      <Button
+        title={isLogin ? "회원가입으로 이동" : "로그인으로 이동"}
+        onPress={() => setIsLogin(!isLogin)}
+      />
     </View>
   );
-};
-const { width } = Dimensions.get("window");
-
-const IMAGE_SIZE = width / 3;
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
+    padding: 20,
+    backgroundColor: "#fff",
   },
-  imageContainer: {
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
     marginBottom: 20,
   },
-  image: {
-    width: IMAGE_SIZE,
-    height: IMAGE_SIZE,
-  },
-  loginContainer: {},
-  button: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#fff",
-    backgroundColor: "#ff8585",
-    alignSelf: "flex-end",
-    alignItems: "flex-end",
-    paddingVertical: 5,
-    paddingHorizontal: 10,
+  input: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#ccc",
     borderRadius: 5,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.1, // Shadow transparency
-    shadowRadius: 4, // Shadow blur radius
-    elevation: 4, // Shadow for Android
+    padding: 10,
+    marginBottom: 10,
   },
 });
-
-export default InitialScreen;
